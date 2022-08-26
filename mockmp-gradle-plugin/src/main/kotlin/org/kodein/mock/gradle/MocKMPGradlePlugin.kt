@@ -26,9 +26,12 @@ class MocKMPGradlePlugin : Plugin<Project> {
         target.extensions.add("mockmp", ext)
 
         target.afterEvaluate {
-            val kotlin = extensions.findByType<KotlinMultiplatformExtension>() ?: throw GradleException("Could not find Kotlin/Multiplatform plugin")
+            val kotlin = extensions.findByType<KotlinMultiplatformExtension>()
+                ?: throw GradleException("Could not find Kotlin/Multiplatform plugin")
 
-            val jvmTarget = kotlin.targets.first { it.preset?.name == "jvm" || it.preset?.name == "android" }
+            val jvmTarget = kotlin.targets.firstOrNull { it.preset?.name == "jvm" }
+                ?: kotlin.targets.firstOrNull { it.preset?.name == "android" }
+                ?: throw GradleException("MocKMP requires platform `jvm` or `android` to be defined")
 
             dependencies {
                 // Running KSP for JVM only
